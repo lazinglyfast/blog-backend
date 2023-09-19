@@ -52,6 +52,52 @@ const blogs = [
   }
 ]
 
+describe("author with most blogs", () => {
+  test("from empty list is null", () => {
+    expect(list_helper.most_blogs([])).toEqual({
+      author: undefined,
+      blogs: 0,
+    })
+  })
+
+  test("from list with one blog it is the corresponding author", () => {
+    expect(list_helper.most_blogs(blogs.slice(0, 1))).toEqual({
+      author: blogs[0].author,
+      blogs: 1,
+    })
+  })
+
+  test("from list with many blogs compute the author with most blogs", () => {
+    expect(list_helper.most_blogs(blogs)).toEqual({
+      author: "Robert C. Martin",
+      blogs: 3
+    })
+  })
+})
+
+describe("author with most likes", () => {
+  test("from empty list is null", () => {
+    expect(list_helper.most_likes([])).toEqual({
+      author: undefined,
+      likes: 0,
+    })
+  })
+
+  test("from list with one blog it is the corresponding author", () => {
+    expect(list_helper.most_likes(blogs.slice(0, 1))).toEqual({
+      author: blogs[0].author,
+      likes: blogs[0].likes,
+    })
+  })
+
+  test("from list with many blogs compute the author with most likes", () => {
+    expect(list_helper.most_likes(blogs)).toEqual({
+      author: "Edsger W. Dijkstra",
+      likes: 17
+    })
+  })
+})
+
 describe("favorite blog", () => {
   test("from empty list is null", () => {
     expect(list_helper.favorite_blog([])).toBe(null)
