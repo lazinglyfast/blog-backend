@@ -37,6 +37,11 @@ describe("blog api", () => {
     expect(titles).toContain(newBlog.title)
   })
 
+  test("returned blog has id instead of _id", async () => {
+    const response = await api.get("/api/blogs")
+    expect(response.body[0].id).toBeDefined()
+  })
+
   afterAll(() => {
     mongoose.connection.close()
   })

@@ -1,5 +1,3 @@
-// const Blog = require("../models/blog.cjs")
-
 const blogs = [
   {
     title: "React patterns",
