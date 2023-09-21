@@ -3,16 +3,15 @@ const Blog = require("../models/blog.cjs")
 
 const blogRouter = express.Router()
 
-blogRouter.get("/", (_req, res) => {
-  Blog.find({}).then(blogs => res.json(blogs))
+blogRouter.get("/", async (_req, res) => {
+  const blogs = await Blog.find({})
+  res.json(blogs)
 })
 
-blogRouter.post("/", (req, res) => {
-  console.log(req.body) // coming empty, why?
+blogRouter.post("/", async (req, res) => {
   const blog = new Blog(req.body)
-  blog.save().then(savedBlog => {
-    res.status(201).json(savedBlog)
-  })
+  const savedBlog = await blog.save()
+  res.status(201).json(savedBlog)
 })
 
 module.exports = blogRouter
