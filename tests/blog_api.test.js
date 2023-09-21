@@ -92,12 +92,31 @@ describe("deletion", () => {
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
       .expect(204)
+
     const responseAfter = await api.get("/api/blogs")
     const blogsAfter = responseAfter.body
     expect(blogsAfter).toHaveLength(blogsBefore.length - 1)
 
     const ids = blogsAfter.map(b => b.id)
     expect(ids).not.toContain(blogToDelete.id)
+  })
+})
+
+describe("update", () => {
+  test("blog can be updated", async () => {
+    const before = await api.get("/api/blogs")
+    const blog = before.body[0]
+    const blogToUpdate = {
+      ...blog,
+      likes: blog.likes + 1
+    }
+    await api
+      .put("/api/blogs")
+      .send(blogToUpdate)
+
+    const after = await api.get(`/api/blogs/${blogToUpdate.id}`)
+    const updatedBlog = after.body
+    expect(updatedBlog.likes).toBe(blog.likes + 1)
   })
 })
 
