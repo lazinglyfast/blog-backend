@@ -56,6 +56,29 @@ describe("blog api", () => {
     expect(response.body.likes).toBe(0)
   })
 
+  test("if title is missing returns 400", async () => {
+    const newBlog = {
+      author: "missing title",
+      url: "https://reactpatterns.com/",
+      likes: 7,
+    }
+
+    await api.post("/api/blogs")
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test("if url is missing returns 400", async () => {
+    const newBlog = {
+      author: "missing url",
+      likes: 7,
+    }
+
+    await api.post("/api/blogs")
+      .send(newBlog)
+      .expect(400)
+  })
+
   afterAll(() => {
     mongoose.connection.close()
   })
