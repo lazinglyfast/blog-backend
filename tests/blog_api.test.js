@@ -20,14 +20,14 @@ describe("blog api", () => {
 
   test("can insert a blog", async () => {
     const newBlog = {
-      title: "React patterns",
+      title: "Fighting patterns",
       author: "Jackie Chan",
       url: "https://reactpatterns.com/",
       likes: 7,
-      id: "650c4fff02c8bc656e7cb043"
     }
 
-    await api.post("/api/blogs", newBlog)
+    await api.post("/api/blogs")
+      .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
 
@@ -40,6 +40,20 @@ describe("blog api", () => {
   test("returned blog has id instead of _id", async () => {
     const response = await api.get("/api/blogs")
     expect(response.body[0].id).toBeDefined()
+  })
+
+  test("if likes is not provided then it defaults to 0", async () => {
+    const newBlog = {
+      title: "React patterns",
+      author: "Jackie Chan",
+      url: "https://reactpatterns.com/",
+    }
+
+    const response = await api
+      .post("/api/blogs")
+      .send(newBlog)
+
+    expect(response.body.likes).toBe(0)
   })
 
   afterAll(() => {
