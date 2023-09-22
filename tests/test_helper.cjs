@@ -1,3 +1,5 @@
+const User = require("../models/user.cjs")
+
 const blogs = [
   {
     title: "React patterns",
@@ -37,4 +39,21 @@ const blogs = [
   },
 ]
 
-module.exports = { blogs }
+const users = [
+  {
+    name: "oswald",
+    username: "coala",
+    password: "bear",
+  },
+  {
+    name: "silvia",
+    username: "juddith",
+    password: "don't you hang up",
+  },
+]
+
+const usersInDb = () => {
+  return User.find({})
+}
+
+module.exports = { blogs, users, usersInDb }
