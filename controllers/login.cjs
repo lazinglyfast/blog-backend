@@ -12,6 +12,7 @@ loginRouter.post("/", async (req, res) => {
     return res.status(400).json({ error: "password does not match" })
   }
   // what should the payload be?
+  // I realized that we'll need it later to get the user so username is correct
   const token = jwt.sign(username, process.env.SECRET)
   res.status(200).json({ token })
 })

@@ -1,6 +1,7 @@
 const express = require("express")
 const Blog = require("../models/blog.cjs")
 const User = require("../models/user.cjs")
+const jwt = require("jsonwebtoken")
 
 const blogRouter = express.Router()
 
@@ -16,8 +17,16 @@ blogRouter.get("/:id", async (req, res) => {
 })
 
 blogRouter.post("/", async (req, res) => {
-  const users = await User.find({})
-  const creator = users[0]
+  const token = req.headers["authorization"]
+  jwt.verify(token, process.env.SECRET)
+  // realized the below gets handled by the errorHandler middleware
+  // const validToken = token && jwt.verify(token, process.env.SECRET)
+  // if (!validToken) {
+  //   // these http code constants should be behind an enum
+  //   return res.status(401).json({ error: "invalid token" })
+  // }
+  const username = jwt.decode(token, process.env.SECRET)
+  const creator = await User.findOne({ username })
   const body = req.body
   const blogToSave = {
     title: body.title,
