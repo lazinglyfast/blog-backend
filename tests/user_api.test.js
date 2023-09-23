@@ -69,7 +69,7 @@ describe("user creation", () => {
       username: "coala",
       password: "bear"
     }
-    const message = /username.*exists/
+    const message = /username.*expected.*unique/
     await testCreatingInvalidUser(usernameExists, message)
   })
 

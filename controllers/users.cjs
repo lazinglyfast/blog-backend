@@ -3,7 +3,7 @@ const User = require("../models/user.cjs")
 const bcrypt = require("bcrypt")
 
 userRouter.get("/", async (_req, res) => {
-  const users = await User.find({})
+  const users = await User.find({}).populate("blogs", "url title author")
   res.json(users)
 })
 
@@ -22,11 +22,12 @@ userRouter.post("/", async (req, res) => {
     return res.status(400).json({ error: message })
   }
 
-  const usernameExists = await User.findOne({ username })
-  if (usernameExists) {
-    const message = "username already exists"
-    return res.status(400).json({ error: message })
-  }
+  // replaced by the mongoose-unique-validator library
+  // const usernameExists = await User.findOne({ username })
+  // if (usernameExists) {
+  //   const message = "username already exists"
+  //   return res.status(400).json({ error: message })
+  // }
 
   const salt = 10
   const userToSave = {

@@ -5,13 +5,21 @@ const blogSchema = new mongoose.Schema({
   author: String,
   url: String,
   likes: Number,
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  },
 })
 
 blogSchema.set("toJSON", {
-  transform: (_obj, updatedObj) => {
-    updatedObj.id = updatedObj._id
+  transform: (obj, updatedObj) => {
+    updatedObj.id = obj.id
     delete updatedObj._id
     delete updatedObj.__v
+    // updatedObj.creator = obj.creator
+    // if (updatedObj.creator) {
+    //   delete updatedObj.creator.blogs
+    // }
   }
 })
 
