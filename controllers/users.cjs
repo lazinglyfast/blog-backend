@@ -16,11 +16,13 @@ userRouter.post("/", async (req, res) => {
   }
 
   if (password.length < 3) {
-    const message = "password must have at least 3 characters"
+    // this should be defined in only one place
+    const minLength = 3
+    const message = `User validation failed: password: Path \`password\` is shorter than the minimum allowed length (${minLength}).`
     return res.status(400).json({ error: message })
   }
 
-  const usernameExists = await User.find({ username })
+  const usernameExists = await User.findOne({ username })
   if (usernameExists) {
     const message = "username already exists"
     return res.status(400).json({ error: message })
