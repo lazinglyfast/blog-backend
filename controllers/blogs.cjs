@@ -52,7 +52,6 @@ blogRouter.delete("/:id", async (req, res) => {
     return res.status(404).json({ error: message })
   }
 
-  console.log(blog.creator, req.user)
   if (blog.creator.toString() !== req.user.id.toString()) {
     const message = "logged in user does not have permission to delete resource"
     return res.status(401).json({ error: message })

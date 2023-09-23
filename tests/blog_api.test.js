@@ -1,12 +1,35 @@
 const Blog = require("../models/blog.cjs")
+const User = require("../models/user.cjs")
 const supertest = require("supertest")
 const api = supertest(require("../app.cjs"))
 const helper = require("./test_helper.cjs")
 const mongoose = require("mongoose")
 
+const logUserReturnToken = async (i) => {
+  const user = helper.users[i]
+  const login = await api.post("/api/login").send(user)
+  return login.body.token
+}
+
 beforeEach(async () => {
+  await User.deleteMany({})
+  await Promise.all(helper.users.map(u => api.post("/api/users").send(u)))
+  const users = await helper.usersInDb()
+
   await Blog.deleteMany({})
-  await Blog.insertMany(helper.blogs)
+
+  // associate first blog with first user
+  const blog = await new Blog({ ...helper.blogs[0], creator: users[0]._id }).save()
+  users[0].blogs = users[0].blogs.concat(blog._id)
+  await users[0].save()
+
+  // associate other blogs with second user
+  const blogs = await Promise.all(helper.blogs.slice(1).map(async blog => {
+    return await new Blog({ ...blog, creator: users[1]._id }).save()
+  }))
+
+  users[1].blogs = blogs.map(b => b._id)
+  await users[1].save()
 })
 
 describe("querying many blogs", () => {
@@ -20,7 +43,7 @@ describe("querying many blogs", () => {
 })
 
 describe("creation of a blog entry", () => {
-  test("can insert a blog", async () => {
+  test("fails if user is not authenticated", async () => {
     const newBlog = {
       title: "Fighting patterns",
       author: "Jackie Chan",
@@ -29,6 +52,20 @@ describe("creation of a blog entry", () => {
     }
 
     await api.post("/api/blogs")
+      .send(newBlog)
+      .expect(401)
+  })
+
+  test("can insert a blog with an authenticated user", async () => {
+    const newBlog = {
+      title: "Fighting patterns",
+      author: "Jackie Chan",
+      url: "https://reactpatterns.com/",
+      likes: 7,
+    }
+
+    await api.post("/api/blogs")
+      .set("authorization", await logUserReturnToken(0))
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
@@ -55,6 +92,7 @@ describe("validation", () => {
 
     const response = await api
       .post("/api/blogs")
+      .set("authorization", await logUserReturnToken(0))
       .send(newBlog)
 
     expect(response.body.likes).toBe(0)
@@ -67,7 +105,9 @@ describe("validation", () => {
       likes: 7,
     }
 
-    await api.post("/api/blogs")
+    await api
+      .post("/api/blogs")
+      .set("authorization", await logUserReturnToken(0))
       .send(newBlog)
       .expect(400)
   })
@@ -78,19 +118,24 @@ describe("validation", () => {
       likes: 7,
     }
 
-    await api.post("/api/blogs")
+    await api
+      .post("/api/blogs")
+      .set("authorization", await logUserReturnToken(0))
       .send(newBlog)
       .expect(400)
   })
 })
 
 describe("deletion", () => {
-  test("blog can be deleted", async () => {
+  test("blog can be deleted by creator", async () => {
+
     const responseBefore = await api.get("/api/blogs")
+
     const blogsBefore = responseBefore.body
     const blogToDelete = blogsBefore[0]
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set("authorization", await logUserReturnToken(0))
       .expect(204)
 
     const responseAfter = await api.get("/api/blogs")
