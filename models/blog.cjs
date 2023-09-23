@@ -16,6 +16,7 @@ blogSchema.set("toJSON", {
     updatedObj.id = obj.id
     delete updatedObj._id
     delete updatedObj.__v
+    // this hack is unnecessary if we pass creator._id instead of creator to a new blog
     // updatedObj.creator = obj.creator
     // if (updatedObj.creator) {
     //   delete updatedObj.creator.blogs
