@@ -10,4 +10,12 @@ const errorHandler = (error, _req, res, next) => {
   next(error)
 }
 
-module.exports = { errorHandler }
+const tokenExtractor = (req, _res, next) => {
+  req.token = req.headers["authorization"]
+  next()
+}
+
+module.exports = {
+  errorHandler,
+  tokenExtractor,
+}
