@@ -45,8 +45,24 @@ blogRouter.post("/", async (req, res) => {
 })
 
 blogRouter.delete("/:id", async (req, res) => {
+  const username = jwt.decode(req.token, process.env.SECRET)
+  if (!username) {
+    const message = "invalid access token"
+    return res.status(401).json({ error: message })
+  }
+  const loggedInUser = await User.findOne({ username })
   const id = req.params.id
-  await Blog.findByIdAndDelete(id)
+  const blog = await Blog.findById(id)
+  if (!blog) {
+    const message = "blog does not exist"
+    return res.status(404).json({ error: message })
+  }
+
+  if (blog.creator.toString() !== loggedInUser.id.toString()) {
+    const message = "logged in user does not have permission to delete resource"
+    return res.status(401).json({ error: message })
+  }
+  await Blog.deleteOne(blog)
   res.status(204).end()
 })
 
