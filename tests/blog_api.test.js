@@ -13,28 +13,34 @@ const logUserReturnToken = async (i) => {
 
 beforeEach(async () => {
   await User.deleteMany({})
-  await Promise.all(helper.users.map(u => api.post("/api/users").send(u)))
+  await Promise.all(helper.users.map((u) => api.post("/api/users").send(u)))
   const users = await helper.usersInDb()
 
   await Blog.deleteMany({})
 
   // associate first blog with first user
-  const blog = await new Blog({ ...helper.blogs[0], creator: users[0]._id }).save()
+  const blog = await new Blog({
+    ...helper.blogs[0],
+    creator: users[0]._id,
+  }).save()
   users[0].blogs = users[0].blogs.concat(blog._id)
   await users[0].save()
 
   // associate other blogs with second user
-  const blogs = await Promise.all(helper.blogs.slice(1).map(async blog => {
-    return await new Blog({ ...blog, creator: users[1]._id }).save()
-  }))
+  const blogs = await Promise.all(
+    helper.blogs.slice(1).map(async (blog) => {
+      return await new Blog({ ...blog, creator: users[1]._id }).save()
+    }),
+  )
 
-  users[1].blogs = blogs.map(b => b._id)
+  users[1].blogs = blogs.map((b) => b._id)
   await users[1].save()
 })
 
 describe("querying many blogs", () => {
   test("returns all blogs", async () => {
-    const response = await api.get("/api/blogs")
+    const response = await api
+      .get("/api/blogs")
       .expect(200)
       .expect("Content-Type", /application\/json/)
 
@@ -51,9 +57,7 @@ describe("creation of a blog entry", () => {
       likes: 7,
     }
 
-    await api.post("/api/blogs")
-      .send(newBlog)
-      .expect(401)
+    await api.post("/api/blogs").send(newBlog).expect(401)
   })
 
   test("can insert a blog with an authenticated user", async () => {
@@ -64,7 +68,8 @@ describe("creation of a blog entry", () => {
       likes: 7,
     }
 
-    await api.post("/api/blogs")
+    await api
+      .post("/api/blogs")
       .set("authorization", await logUserReturnToken(0))
       .send(newBlog)
       .expect(201)
@@ -72,7 +77,7 @@ describe("creation of a blog entry", () => {
 
     const response = await api.get("/api/blogs")
     expect(response.body).toHaveLength(helper.blogs.length + 1)
-    const titles = response.body.map(b => b.title)
+    const titles = response.body.map((b) => b.title)
     expect(titles).toContain(newBlog.title)
   })
 })
@@ -128,7 +133,6 @@ describe("validation", () => {
 
 describe("deletion", () => {
   test("blog can be deleted by creator", async () => {
-
     const responseBefore = await api.get("/api/blogs")
 
     const blogsBefore = responseBefore.body
@@ -142,7 +146,7 @@ describe("deletion", () => {
     const blogsAfter = responseAfter.body
     expect(blogsAfter).toHaveLength(blogsBefore.length - 1)
 
-    const ids = blogsAfter.map(b => b.id)
+    const ids = blogsAfter.map((b) => b.id)
     expect(ids).not.toContain(blogToDelete.id)
   })
 })
@@ -153,11 +157,9 @@ describe("update", () => {
     const blog = before.body[0]
     const blogToUpdate = {
       ...blog,
-      likes: blog.likes + 1
+      likes: blog.likes + 1,
     }
-    await api
-      .put("/api/blogs")
-      .send(blogToUpdate)
+    await api.put("/api/blogs").send(blogToUpdate)
 
     const after = await api.get(`/api/blogs/${blogToUpdate.id}`)
     const updatedBlog = after.body

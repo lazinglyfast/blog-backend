@@ -121,7 +121,6 @@ describe("total likes", () => {
   })
 
   test("of a bigger list is calculated right", () => {
-
     expect(list_helper.total_likes(blogs)).toBe(36)
   })
 })
@@ -131,4 +130,3 @@ describe("list_helper", () => {
     expect(list_helper.dummy()).toBe(1)
   })
 })
-

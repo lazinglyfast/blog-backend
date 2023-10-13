@@ -6,6 +6,7 @@ const mongoose = require("mongoose")
 const blogRouter = require("./controllers/blogs.cjs")
 const userRouter = require("./controllers/users.cjs")
 const loginRouter = require("./controllers/login.cjs")
+const resetRouter = require("./controllers/reset.cjs")
 const middleware = require("./utils/middleware.cjs")
 require("dotenv").config()
 
@@ -25,6 +26,9 @@ app.delete("/api/blogs/:id", middleware.userExtractor)
 app.use("/api/blogs", blogRouter)
 app.use("/api/users", userRouter)
 app.use("/api/login", loginRouter)
+if (process.env.NODE_ENV === "test") {
+  app.use("/api/reset", resetRouter)
+}
 app.use(middleware.errorHandler)
 
 module.exports = app

@@ -13,9 +13,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  blogs: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Blog" }
-  ],
+  blogs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
 })
 
 schema.set("toJSON", {
@@ -24,7 +22,7 @@ schema.set("toJSON", {
     delete returnedUser._id
     delete returnedUser.__v
     delete returnedUser.passwordHash
-  }
+  },
 })
 
 schema.plugin(uniqueValidator)

@@ -6,7 +6,8 @@ const dummy = (_blogs) => {
 
 const total_likes = (blogs) => blogs.reduce((acc, b) => acc + b.likes, 0)
 
-const favorite_blog = (blogs) => blogs.reduce((fav, b) => fav && fav.likes > b.likes ? fav : b, null)
+const favorite_blog = (blogs) =>
+  blogs.reduce((fav, b) => (fav && fav.likes > b.likes ? fav : b), null)
 
 const most_blogs = (blogs_list) => {
   const { author, stat } = most(blogs_list, () => 1)
@@ -14,15 +15,19 @@ const most_blogs = (blogs_list) => {
 }
 
 const most_likes = (blogs_list) => {
-  const { author, stat } = most(blogs_list, b => b.likes)
+  const { author, stat } = most(blogs_list, (b) => b.likes)
   return { author, likes: stat }
 }
 
 const most = (blogs, fn) => {
-  const hashmap = _.reduce(blogs, (acc, b) => {
-    const value = (acc.get(b.author) || 0) + fn(b)
-    return acc.set(b.author, value)
-  }, new Map())
+  const hashmap = _.reduce(
+    blogs,
+    (acc, b) => {
+      const value = (acc.get(b.author) || 0) + fn(b)
+      return acc.set(b.author, value)
+    },
+    new Map(),
+  )
 
   const init = {
     author: undefined,
@@ -32,7 +37,11 @@ const most = (blogs, fn) => {
   const entries = _.map(Array.from(hashmap), ([author, stat]) => {
     return { author, stat } // cannot shorthand this
   })
-  return _.reduce(entries, (max, b) => (max && max.stat) > b.stat ? max : b, init)
+  return _.reduce(
+    entries,
+    (max, b) => ((max && max.stat) > b.stat ? max : b),
+    init,
+  )
 }
 
 module.exports = {
