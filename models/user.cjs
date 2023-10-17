@@ -17,11 +17,11 @@ const schema = new mongoose.Schema({
 })
 
 schema.set("toJSON", {
-  transform: (document, returnedUser) => {
-    returnedUser.id = document._id
-    delete returnedUser._id
-    delete returnedUser.__v
-    delete returnedUser.passwordHash
+  transform: (obj, returnedObj) => {
+    returnedObj.id = obj._id
+    delete returnedObj._id
+    delete returnedObj.__v
+    delete returnedObj.passwordHash
   },
 })
 

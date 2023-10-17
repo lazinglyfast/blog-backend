@@ -1,11 +1,14 @@
 const express = require("express")
 const Blog = require("../models/blog.cjs")
+const User = require("../models/user.cjs")
 const jwt = require("jsonwebtoken")
 
 const blogRouter = express.Router()
 
 blogRouter.get("/", async (_req, res) => {
-  const blogs = await Blog.find({}).populate("creator", "name username")
+  const blogs = await Blog.find({})
+    .populate("creator", "name username")
+    .populate("comments")
   res.json(blogs)
 })
 
@@ -39,9 +42,10 @@ blogRouter.post("/", async (req, res) => {
     return res.status(400).end()
   }
   const savedBlog = await new Blog(blogToSave).save()
-  savedBlog.populate("creator")
+
   req.user.blogs = req.user.blogs.concat(savedBlog._id)
   await req.user.save()
+  await populateCreator(savedBlog)
   res.status(201).json(savedBlog)
 })
 
@@ -72,7 +76,16 @@ blogRouter.put("/", async (req, res) => {
   const updatedBlog = await Blog.findByIdAndUpdate(body.id, blogToUpdate, {
     new: true,
   })
+  await populateCreator(updatedBlog)
   res.json(updatedBlog)
 })
+
+const populateCreator = async (blog) => {
+  // out-of-the-blue this no longer works
+  blog.populate("creator")
+
+  // had to resort to this
+  blog.creator = await User.findById(blog.creator)
+}
 
 module.exports = blogRouter

@@ -7,6 +7,12 @@ userRouter.get("/", async (_req, res) => {
   res.json(users)
 })
 
+userRouter.get("/:id", async (req, res) => {
+  const id = req.params.id
+  const user = await User.findById(id).populate("blogs", "url title author")
+  res.json(user)
+})
+
 userRouter.post("/", async (req, res) => {
   const { name, username, password } = req.body
   // not a big fan of two diff validation logics (the other being through mongoose)

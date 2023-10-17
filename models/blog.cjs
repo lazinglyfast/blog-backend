@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const blogSchema = new mongoose.Schema({
+const schema = new mongoose.Schema({
   title: String,
   author: String,
   url: String,
@@ -9,9 +9,10 @@ const blogSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
 })
 
-blogSchema.set("toJSON", {
+schema.set("toJSON", {
   transform: (obj, updatedObj) => {
     updatedObj.id = obj.id
     delete updatedObj._id
@@ -24,6 +25,6 @@ blogSchema.set("toJSON", {
   },
 })
 
-const Blog = mongoose.model("Blog", blogSchema)
+const Blog = mongoose.model("Blog", schema)
 
 module.exports = Blog
